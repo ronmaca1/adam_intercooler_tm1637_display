@@ -44,7 +44,7 @@ const byte inputPin = A4;
 const byte dacsel = 10;
 const byte ldac = 9;
 const byte reset_out = 12;
-const int numReadings = 100;
+const int numReadings = 15;
 float samples[numReadings]; // the samples from the analog input
 
 byte dacoutL = 0;
@@ -84,10 +84,9 @@ void setup()
   // send the calval level to the calibration DAC
 
   caldacset();
-    display.clear();
+  display.clear();
   EEPROM.get(setbrightAddr, brightval);
-//display.setBrightness(brightval);
-display.setBrightness(7);
+  display.setBrightness(brightval);
   // kill the digital buffer on our analog input
   DIDR0 |= _BV(ADC4D);
 
@@ -154,26 +153,21 @@ void loop()
   steinhart = 1.0 / steinhart;           // Invert
   steinhart -= 273.15;                   // convert to C
                                          // end of steinhart hart
-#ifdef _DEBUG_
-  Serial.print("Temperature ");
-  Serial.print(steinhart);
-  Serial.println(" *C");
-  Serial.println();
-#endif
+
   if (fahrenheit == false) // output degrees in Centigrade
   {
-    display.showNumberDec(steinhart, false);
+    display.showNumberDec((int)steinhart, false);
     //matrix.print(steinhart, 1);
     //matrix.writeDisplay();
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
   {
-      //display.showNumberDec(11, false);
-      display.showNumberDec(((steinhart) * (9.0 / 5.0) + 32 ), false);
+    //display.showNumberDec(11, false);
+    display.showNumberDec((int)((steinhart) * (9.0 / 5.0) + 32), false);
     //matrix.print(((steinhart) * (9.0 / 5.0)) + 32, 1);
     //matrix.writeDisplay();
   }
-  delay(10); // delay in between reads for stability
+  delay(5); // delay in between reads for stability
 }
 
 // <helper functions for settings>
@@ -311,7 +305,7 @@ void set_bright(void)
     {
       EEPROM.put(setbrightAddr, (storedparamtype)(brightval));
       EEPROM.get(setbrightAddr, brightval);
-      //////////////////////////////////////////////////////////matrix.setBrightness(brightval);
+      display.setBrightness(brightval);
     }
     else
     {
