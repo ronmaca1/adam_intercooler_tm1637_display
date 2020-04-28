@@ -1,0 +1,5 @@
+{
+    "board": "adafruit:avr:itsybitsy32u4_5V",
+    "port": "COM5",
+    "sketch": "adam_intercooler_tm1637_display.ino"
+}
