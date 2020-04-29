@@ -156,14 +156,14 @@ void loop()
 
   if (fahrenheit == false) // output degrees in Centigrade
   {
-    display.showNumberDec((int)steinhart, false);
+    display.showNumberDec((int)(steinhart+0.5), false);
     //matrix.print(steinhart, 1);
     //matrix.writeDisplay();
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
   {
     //display.showNumberDec(11, false);
-    display.showNumberDec((int)((steinhart) * (9.0 / 5.0) + 32), false);
+    display.showNumberDec((int)(((steinhart) * (9.0 / 5.0) + 32)+0.5), false);
     //matrix.print(((steinhart) * (9.0 / 5.0)) + 32, 1);
     //matrix.writeDisplay();
   }
