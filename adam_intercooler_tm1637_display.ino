@@ -44,7 +44,7 @@ const byte inputPin = A4;
 const byte dacsel = 10;
 const byte ldac = 9;
 const byte reset_out = 12;
-const int numReadings = 15;
+const int numReadings = 25;
 float samples[numReadings]; // the samples from the analog input
 
 byte dacoutL = 0;
@@ -156,18 +156,13 @@ void loop()
 
   if (fahrenheit == false) // output degrees in Centigrade
   {
-    display.showNumberDec((int)(steinhart+0.5), false);
-    //matrix.print(steinhart, 1);
-    //matrix.writeDisplay();
+    display.showNumberDec((int)(steinhart), false); 
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
-  {
-    //display.showNumberDec(11, false);
-    display.showNumberDec((int)(((steinhart) * (9.0 / 5.0) + 32)+0.5), false);
-    //matrix.print(((steinhart) * (9.0 / 5.0)) + 32, 1);
-    //matrix.writeDisplay();
+  {    
+    display.showNumberDec((int)(((steinhart) * (9.0 / 5.0) + 32)), false);
   }
-  delay(5); // delay in between reads for stability
+  delay(150); // delay in between reads for stability
 }
 
 // <helper functions for settings>
@@ -203,8 +198,8 @@ void erase_eeprom(void)
 void set_defaults(void)
 {
   EEPROM.put(sigaddr, 0xAA55);
-  EEPROM.put(setcalAddr, 255); //5 volts inital reference
-  EEPROM.put(setr1Addr, 10500);
+  EEPROM.put(setcalAddr, 251); //5 volts inital reference
+  EEPROM.put(setr1Addr, 10000);
   EEPROM.put(setcelorfahrAddr, true); // display fahrenheit by default
   EEPROM.put(setbrightAddr, 3);       // set display at half brightness
 }
