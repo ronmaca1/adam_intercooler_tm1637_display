@@ -34,7 +34,8 @@ storedparamtype seriesresistor;
 
 int readIndex = 0; // the index of the current reading
 // The beta coefficient of the thermistor (usually 3000-4000)
-int thermbeta = 3600; // 3776 was calculated value
+int thermbeta = 3778;
+//int thermbeta = 3600; // 3778 was calculated value
 // resistance at tempnom (25c)
 int thermnomres = 11150;
 // temp. for nominal resistance (almost always 25 C)
@@ -153,14 +154,17 @@ void loop()
   steinhart = 1.0 / steinhart;           // Invert
   steinhart -= 273.15;                   // convert to C
                                          // end of steinhart hart
+                                           
 
   if (fahrenheit == false) // output degrees in Centigrade
   {
+   // display.showNumberDec (round((steinhart)), false);
     display.showNumberDec((int)(steinhart), false); 
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
-  {    
-    display.showNumberDec((int)(((steinhart) * (9.0 / 5.0) + 32)), false);
+  {   
+    //display.showNumberDec (round(((steinhart) * (9.0 / 5.0) + 32)), false);
+    display.showNumberDec((int)((steinhart) * (9.0 / 5.0) + 32), false);
   }
   delay(150); // delay in between reads for stability
 }
