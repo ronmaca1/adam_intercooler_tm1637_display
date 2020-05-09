@@ -8,7 +8,7 @@
 #define CLK 3
 #define DIO 2
 
-//#define _DEBUG_
+#define _DEBUG_
 #define erased 0
 #define eepromparamsize 2 // EEPROM storage allocation units in bytes == sizeof(int)
 #define sigaddr 1         // first active eeprom addr. skipped addr 0.
@@ -41,7 +41,7 @@ int thermnomres = 11150;
 // temp. for nominal resistance (almost always 25 C)
 int tempnom = 25;
 
-const byte inputPin = A4;
+const byte inputPin = A0;
 const byte dacsel = 10;
 const byte ldac = 9;
 const byte reset_out = 12;
@@ -159,12 +159,12 @@ void loop()
   if (fahrenheit == false) // output degrees in Centigrade
   {
    // display.showNumberDec (round((steinhart)), false);
-    display.showNumberDec((int)(steinhart), false); 
+    display.showNumberDecEx((steinhart)*10,0b00100000, false); 
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
   {   
     //display.showNumberDec (round(((steinhart) * (9.0 / 5.0) + 32)), false);
-    display.showNumberDec((int)((steinhart) * (9.0 / 5.0) + 32), false);
+    display.showNumberDecEx(((steinhart) * (9.0 / 5.0) + 32)*10,0b00100000, false);
   }
   delay(150); // delay in between reads for stability
 }
