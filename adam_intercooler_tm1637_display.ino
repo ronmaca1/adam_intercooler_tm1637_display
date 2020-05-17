@@ -8,7 +8,7 @@
 #define CLK 3
 #define DIO 2
 
-#define _DEBUG_
+//#define _DEBUG_
 #define erased 0
 #define eepromparamsize 2 // EEPROM storage allocation units in bytes == sizeof(int)
 #define sigaddr 1         // first active eeprom addr. skipped addr 0.
@@ -201,8 +201,8 @@ void erase_eeprom(void)
 void set_defaults(void)
 {
   EEPROM.put(sigaddr, 0xAA55);
-  EEPROM.put(setcalAddr, 251); //5 volts inital reference
-  EEPROM.put(setr1Addr, 10000);
+  EEPROM.put(setcalAddr, 255); //5 volts inital reference
+  EEPROM.put(setr1Addr, 10350);
   EEPROM.put(setcelorfahrAddr, true); // display fahrenheit by default
   EEPROM.put(setbrightAddr, 3);       // set display at half brightness
 }
