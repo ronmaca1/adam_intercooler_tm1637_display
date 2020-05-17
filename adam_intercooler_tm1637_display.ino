@@ -41,7 +41,7 @@ int thermnomres = 11150;
 // temp. for nominal resistance (almost always 25 C)
 int tempnom = 25;
 
-const byte inputPin = A0;
+const byte inputPin = A4;
 const byte dacsel = 10;
 const byte ldac = 9;
 const byte reset_out = 12;
@@ -98,7 +98,6 @@ void setup()
   sCmd.addCommand("SETF", set_fahrenheit);
   sCmd.addCommand("SETC", set_celsius);
   sCmd.addCommand("SETBRIGHT", set_bright);
-  sCmd.addCommand("SHOWEM", show_parameters);
   sCmd.addCommand("HELP", show_help);
   sCmd.addCommand("PSET", print_current_settings);
   sCmd.addCommand("RESET", reset_system);
@@ -314,18 +313,6 @@ void set_bright(void)
   }
 }
 
-void show_parameters(void)
-{
-  Serial.println();
-  Serial.println("debugging info");
-  Serial.println(calval);
-  Serial.println(seriesresistor);
-  Serial.println(fahrenheit);
-  Serial.println(brightval);
-  Serial.println("end of debugging info");
-  Serial.println();
-}
-
 void show_help()
 {
   Serial.println("");
@@ -348,7 +335,7 @@ void show_help()
   Serial.println("");
 
   Serial.println(F("\"SETBRIGHT\" sets the display "));
-  Serial.println(F(" brightnes in steps from  0 to 15 "));
+  Serial.println(F(" brightnes in steps from  0 to 7 "));
   Serial.println(F("values lower or higher will be ignored"));
   Serial.println("");
 
