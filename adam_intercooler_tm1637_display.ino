@@ -1,4 +1,3 @@
-#include <SPI.h>
 #include <SerialCommand.h>
 #include <EEPROM.h>
 #include <stdio.h>
@@ -12,17 +11,14 @@
 #define erased 0
 #define eepromparamsize 2 // EEPROM storage allocation units in bytes == sizeof(int)
 #define sigaddr 1         // first active eeprom addr. skipped addr 0.
-#define setcalAddr (sigaddr + eepromparamsize)
-#define setr1Addr (setcalAddr + eepromparamsize)
+#define setr1Addr (sigaddr + eepromparamsize)
 #define setcelorfahrAddr (setr1Addr + eepromparamsize)
 #define setbrightAddr (setcelorfahrAddr + eepromparamsize)
-// (use for MCP4901 single channel DAC)
-// VREF gain 1(EXT. Vref)
-#define MCP4901ACONFIGBITS 0x30
+ 
+
 
 typedef unsigned int storedparamtype;
 // <settable parameters>
-storedparamtype calval;
 storedparamtype brightval;
 storedparamtype fahrenheit;
 // which analog pin to connect
@@ -42,20 +38,15 @@ int thermnomres = 11150;
 int tempnom = 25;
 
 const byte inputPin = A4;
-const byte dacsel = 10;
-const byte ldac = 9;
 const byte reset_out = 12;
 const int numReadings = 25;
 float samples[numReadings]; // the samples from the analog input
 
-byte dacoutL = 0;
-byte dacoutH = 0;
 float average = 0;
 float total = 0;
 
 void get_stored_params(void)
 {
-  EEPROM.get(setcalAddr, calval);
   EEPROM.get(setr1Addr, seriesresistor);
   EEPROM.get(setcelorfahrAddr, fahrenheit);
   EEPROM.get(setbrightAddr, brightval);
@@ -69,22 +60,14 @@ void setup()
 {
   digitalWrite(reset_out, HIGH);
   pinMode(reset_out, OUTPUT);
-  digitalWrite(ldac, HIGH);
-  pinMode(ldac, OUTPUT);
-  digitalWrite(dacsel, HIGH);
-  pinMode(dacsel, OUTPUT);
 
   Serial.begin(9600);
 
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setClockDivider(SPI_CLOCK_DIV8);
-  SPI.begin();
   // gets parameters stored in eeprom
   // loads them into settable parameters listed above
   get_stored_params();
   // send the calval level to the calibration DAC
-
-  caldacset();
+  
   display.clear();
   EEPROM.get(setbrightAddr, brightval);
   display.setBrightness(brightval);
@@ -93,7 +76,6 @@ void setup()
 
   // Setup callbacks for SerialCommand commands
   sCmd.addCommand("INIT", init_eeprom); //1
-  sCmd.addCommand("SETCAL", set_cal);
   sCmd.addCommand("SETR1", set_seriesresistor);
   sCmd.addCommand("SETF", set_fahrenheit);
   sCmd.addCommand("SETC", set_celsius);
@@ -169,20 +151,6 @@ void loop()
 }
 
 // <helper functions for settings>
-void caldacset(void)
-{
-  dacoutH = MCP4901ACONFIGBITS | ((calval >> 4) & 0x0F);
-  dacoutL = (calval << 4) & 0xF0;
-  digitalWrite(dacsel, LOW);
-  delayMicroseconds(10); // let the DAC get ready
-  SPI.transfer(dacoutH);
-  SPI.transfer(dacoutL);
-  delayMicroseconds(10); // let the DAC settle
-  digitalWrite(dacsel, HIGH);
-  digitalWrite(ldac, LOW);
-  delayMicroseconds(10);
-  digitalWrite(ldac, HIGH);
-}
 storedparamtype eepromreturn(unsigned int addr)
 {
   storedparamtype eepromdata;
@@ -201,7 +169,6 @@ void erase_eeprom(void)
 void set_defaults(void)
 {
   EEPROM.put(sigaddr, 0xAA55);
-  EEPROM.put(setcalAddr, 255); //5 volts inital reference
   EEPROM.put(setr1Addr, 10350);
   EEPROM.put(setcelorfahrAddr, true); // display fahrenheit by default
   EEPROM.put(setbrightAddr, 3);       // set display at half brightness
@@ -234,28 +201,6 @@ void init_eeprom()
     Serial.println(F("No secret code given, nothing has been done. Bye :-)"));
     Serial.println("");
     return;
-  }
-}
-
-void set_cal()
-{
-  char *arg;
-  int argintval;
-  arg = sCmd.next();
-  if (arg != NULL)
-  {
-    argintval = atoi(arg);
-    if (argintval >= 200 && argintval <= 255) /////////////////////////////////////////
-    {
-      EEPROM.put(setcalAddr, (storedparamtype)(argintval));
-      EEPROM.get(setcalAddr, calval);
-      caldacset();
-    }
-    else
-    {
-      Serial.println(F(" setcal cannot be less than 200 or "));
-      Serial.println(F(" more than 255. Nothing was changed"));
-    }
   }
 }
 
@@ -322,10 +267,6 @@ void show_help()
   Serial.println(F("\"PSET\" Shows current settings"));
   Serial.println("");
 
-  Serial.println(F("\"SETCAL xxx\" sets the temperature accuracy. right around 251 is good"));
-  Serial.println(F("xxx is limited to 190 low and 255 high"));
-  Serial.println(F("values lower or higher we be clipped to the above"));
-
   Serial.println(F("\"SETF\" sets the temperature"));
   Serial.println(F(" display to Fahrenheit "));
   Serial.println("");
@@ -351,10 +292,6 @@ void print_current_settings()
 
   Serial.print(F("EEPROM signature is: "));
   Serial.println((eepromreturn(sigaddr)), HEX);
-  Serial.println("");
-
-  Serial.print(F("setcal is: "));
-  Serial.println((eepromreturn(setcalAddr)), DEC);
   Serial.println("");
 
   Serial.print(F("setbright is: "));
