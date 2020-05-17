@@ -14,24 +14,17 @@
 #define setr1Addr (sigaddr + eepromparamsize)
 #define setcelorfahrAddr (setr1Addr + eepromparamsize)
 #define setbrightAddr (setcelorfahrAddr + eepromparamsize)
- 
-
 
 typedef unsigned int storedparamtype;
 // <settable parameters>
 storedparamtype brightval;
 storedparamtype fahrenheit;
-// which analog pin to connect
-// the value of the 'other' resistor
-// it's actually 10000 ohms, but fudged here
-// so as to allow for calibration by the DAC feeding the resistor
 storedparamtype seriesresistor;
 // </end of settable parameters>
 
 int readIndex = 0; // the index of the current reading
 // The beta coefficient of the thermistor (usually 3000-4000)
-int thermbeta = 3778;
-//int thermbeta = 3600; // 3778 was calculated value
+int thermbeta = 3778.0;
 // resistance at tempnom (25c)
 int thermnomres = 11150;
 // temp. for nominal resistance (almost always 25 C)
@@ -67,7 +60,7 @@ void setup()
   // loads them into settable parameters listed above
   get_stored_params();
   // send the calval level to the calibration DAC
-  
+
   display.clear();
   EEPROM.get(setbrightAddr, brightval);
   display.setBrightness(brightval);
@@ -135,17 +128,16 @@ void loop()
   steinhart = 1.0 / steinhart;           // Invert
   steinhart -= 273.15;                   // convert to C
                                          // end of steinhart hart
-                                           
 
   if (fahrenheit == false) // output degrees in Centigrade
   {
-   // display.showNumberDec (round((steinhart)), false);
-    display.showNumberDecEx((steinhart)*10,0b00100000, false); 
+    // display.showNumberDec (round((steinhart)), false);
+    display.showNumberDecEx((steinhart)*10, 0b00100000, false);
   }
   if (fahrenheit == true) // output degrees in Fahrenheit
-  {   
+  {
     //display.showNumberDec (round(((steinhart) * (9.0 / 5.0) + 32)), false);
-    display.showNumberDecEx(((steinhart) * (9.0 / 5.0) + 32)*10,0b00100000, false);
+    display.showNumberDecEx(((steinhart) * (9.0 / 5.0) + 32) * 10, 0b00100000, false);
   }
   delay(150); // delay in between reads for stability
 }
